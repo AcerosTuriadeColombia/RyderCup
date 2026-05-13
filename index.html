@@ -196,6 +196,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <button class="tab" onclick="showTab('score',this)">Scorecard</button>
   <button class="tab" onclick="showTab('general',this)">General</button>
   <button class="tab" onclick="showTab('salidas',this)">Salidas</button>
+  <button class="tab" onclick="showTab('clasif',this)">Clasificación</button>
 </div>
 
 <!-- JUGADORES -->
@@ -252,6 +253,16 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <div style="margin-top:16px;">
     <button onclick="openDeleteModal()" style="width:100%;padding:12px;border:1.5px solid #c00;border-radius:12px;background:none;color:#c00;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑 Borrar todos los scores</button>
   </div>
+</div>
+
+<!-- CLASIFICACION INDIVIDUAL -->
+<div class="section" id="tab-clasif">
+  <div class="day-selector" style="display:grid;grid-template-columns:repeat(3,1fr);">
+    <button class="day-btn active" id="cl1btn" onclick="setClasifDay(1)">Día 1</button>
+    <button class="day-btn" id="cl2btn" onclick="setClasifDay(2)">Día 2</button>
+    <button class="day-btn" id="cl3btn" onclick="setClasifDay(3)">Torneo</button>
+  </div>
+  <div id="clasif-area"></div>
 </div>
 
 <!-- SALIDAS -->
@@ -324,6 +335,7 @@ window.showTab = function(name, btn) {
   if(name==='general') renderGeneral();
   if(name==='score') populateMatchSel();
   if(name==='parejas') renderMatches();
+  if(name==='clasif') renderClasif();
 }
 
 // ---- PLAYERS ----
@@ -1177,9 +1189,125 @@ document.getElementById('delete-modal').addEventListener('click', function(e) {
   if(e.target === this) closeDeleteModal();
 });
 
+// ---- CLASIFICACION INDIVIDUAL ----
+let clasifDay = 1;
+
+window.setClasifDay = function(d) {
+  clasifDay = d;
+  document.getElementById('cl1btn').classList.toggle('active', d===1);
+  document.getElementById('cl2btn').classList.toggle('active', d===2);
+  document.getElementById('cl3btn').classList.toggle('active', d===3);
+  renderClasif();
+}
+
+function getPlayerScores(day) {
+  const results = [];
+  const matches = state.pairings[day] || [];
+  matches.forEach(m => {
+    const sc = state.scores[m.id];
+    if(!sc) return;
+    // Build player list with their score key
+    const players = [];
+    if(day === 1) {
+      if(m.mx[0]) players.push({ player: m.mx[0], key: 'mx',  team: 'mx' });
+      if(m.mx[1]) players.push({ player: m.mx[1], key: 'mx2', team: 'mx' });
+      if(m.co[0]) players.push({ player: m.co[0], key: 'co',  team: 'co' });
+      if(m.co[1]) players.push({ player: m.co[1], key: 'co2', team: 'co' });
+    } else {
+      if(m.mx[0]) players.push({ player: m.mx[0], key: 'mx', team: 'mx' });
+      if(m.co[0]) players.push({ player: m.co[0], key: 'co', team: 'co' });
+    }
+    players.forEach(({ player, key, team }) => {
+      const vals = sc[key] || [];
+      const gross = vals.reduce((s, v) => s + (+v || 0), 0);
+      if(gross === 0) return; // no score entered yet
+      const hcp80 = Math.round(player.hcp * 0.8);
+      const neto = gross - hcp80;
+      results.push({ name: player.name, hcp: player.hcp, hcp80, gross, neto, team });
+    });
+  });
+  return results.sort((a, b) => a.neto - b.neto);
+}
+
+function getPlayerScoresBothDays() {
+  const d1 = getPlayerScores(1);
+  const d2 = getPlayerScores(2);
+  // Merge by player name
+  const map = {};
+  d1.forEach(p => {
+    map[p.name] = { name: p.name, hcp: p.hcp, hcp80: p.hcp80, team: p.team, gross: p.gross, neto: p.neto, days: 1 };
+  });
+  d2.forEach(p => {
+    if(map[p.name]) {
+      map[p.name].gross += p.gross;
+      map[p.name].neto += p.neto;
+      map[p.name].days += 1;
+    } else {
+      map[p.name] = { name: p.name, hcp: p.hcp, hcp80: p.hcp80, team: p.team, gross: p.gross, neto: p.neto, days: 1 };
+    }
+  });
+  return Object.values(map).sort((a, b) => a.neto - b.neto);
+}
+
+function renderClasif() {
+  const cont = document.getElementById('clasif-area');
+  const dayLabels = { 1: 'Día 1 — Parejas', 2: 'Día 2 — Individual', 3: 'Torneo Completo' };
+  const players = clasifDay === 3 ? getPlayerScoresBothDays() : getPlayerScores(clasifDay);
+
+  if(!players.length) {
+    cont.innerHTML = '<div class="loading">No hay scores ingresados aún.</div>';
+    return;
+  }
+
+  const winner = players[0];
+  let html = '';
+
+  // Winner banner
+  html += `<div class="winner-strip ${winner.team==='mx'?'winner-mx':'winner-co'}" style="margin-bottom:12px;font-size:15px;">
+    🏆 ${winner.name} — Neto ${winner.neto}
+  </div>`;
+
+  // Table
+  html += `<div class="card" style="padding:0;overflow:hidden;">
+    <table class="gen-table" style="margin:0;">
+      <thead><tr>
+        <th style="padding:10px 8px;">#</th>
+        <th>Jugador</th>
+        <th style="text-align:center;">HCP</th>
+        <th style="text-align:center;">80%</th>
+        <th style="text-align:center;">Gross</th>
+        <th style="text-align:center;font-weight:700;color:var(--text);">Neto</th>
+      </tr></thead>
+      <tbody>`;
+
+  players.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+    const teamColor = p.team === 'mx' ? 'var(--mx)' : 'var(--co-dark)';
+    const flag = p.team === 'mx' ? '🇲🇽' : '🇨🇴';
+    html += `<tr style="${i===0?'background:var(--bg);font-weight:600;':''}">
+      <td style="text-align:center;font-size:15px;">${medal}</td>
+      <td>
+        <div style="font-size:13px;font-weight:500;color:${teamColor}">${flag} ${p.name}</div>
+      </td>
+      <td style="text-align:center;font-size:12px;color:var(--muted);">${p.hcp}</td>
+      <td style="text-align:center;font-size:12px;color:var(--muted);">${p.hcp80}</td>
+      <td style="text-align:center;font-size:13px;">${p.gross}</td>
+      <td style="text-align:center;font-size:15px;font-weight:700;">${p.neto}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+  <div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:10px;font-size:11px;color:var(--muted);">
+    Neto = Gross − (HCP × 80%). Menor neto gana.
+  </div>`;
+
+  cont.innerHTML = html;
+}
+
 await loadAll();
 startRealtime();
 renderSalidas();
+renderClasif();
 </script>
 </body>
 </html>
