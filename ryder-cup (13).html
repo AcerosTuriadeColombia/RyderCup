@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ryder Cup — México vs Colombia</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mx: #006847;
+  --mx-light: #e6f4ed;
+  --mx-dark: #004d34;
+  --co: #FCD116;
+  --co-dark: #b89400;
+  --co-bg: #fffbea;
+  --red: #CE1126;
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --border: rgba(0,0,0,0.1);
+  --text: #1a1a1a;
+  --muted: #777;
+  --radius: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.header { background: var(--text); color: white; padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tournament-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
+.live-badge { background: var(--red); color: white; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+.scoreboard { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.team-score { text-align: center; }
+.team-flag { font-size: 20px; }
+.team-label { font-size: 11px; font-weight: 500; letter-spacing: 0.5px; opacity: 0.7; margin: 2px 0; }
+.team-pts { font-family: 'Bebas Neue', sans-serif; font-size: 38px; line-height: 1; }
+.mx-pts { color: #4ade80; }
+.co-pts { color: var(--co); }
+.score-divider { font-size: 20px; opacity: 0.3; text-align: center; }
+
+/* TABS */
+.tabs { display: flex; background: white; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; position: sticky; top: 112px; z-index: 99; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: 1; min-width: 70px; padding: 12px 8px; font-size: 12px; font-weight: 500; text-align: center; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+.tab.active { color: var(--text); border-bottom: 2px solid var(--text); }
+
+/* SECTIONS */
+.section { display: none; padding: 16px; padding-bottom: 80px; }
+.section.active { display: block; }
+
+/* CARDS */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 12px; }
+.card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+/* PLAYERS */
+.team-block { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 12px; }
+.team-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.team-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.mx-dot { background: var(--mx); }
+.co-dot { background: var(--co-dark); }
+.team-header-name { font-weight: 600; font-size: 15px; }
+.player-count { margin-left: auto; font-size: 12px; color: var(--muted); background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+.player-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.player-row input[type="text"] { flex: 1; font-size: 14px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; }
+.player-row input[type="text"]:focus { border-color: #aaa; background: white; }
+.hcp-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; }
+.hcp-wrap input[type="number"] { width: 36px; font-size: 14px; border: none; background: none; text-align: center; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; -moz-appearance: textfield; }
+.hcp-wrap input::-webkit-inner-spin-button { display: none; }
+.hcp-label { font-size: 10px; color: var(--muted); font-weight: 500; }
+.remove-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: none; cursor: pointer; font-size: 16px; color: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.remove-btn:active { background: #fee; color: #c00; }
+.add-btn { width: 100%; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: none; font-size: 13px; color: var(--muted); cursor: pointer; margin-top: 4px; font-family: 'DM Sans', sans-serif; }
+.add-btn:active { background: var(--bg); }
+
+/* BIG BUTTON */
+.btn-main { display: block; width: 100%; padding: 14px; background: var(--text); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; margin-top: 8px; }
+.btn-main:active { opacity: 0.85; }
+.btn-outline { background: none; border: 1.5px solid var(--border); color: var(--text); }
+
+/* MATCH CARDS */
+.match-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; }
+.match-card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.match-num { font-size: 12px; font-weight: 600; color: var(--muted); }
+.diff-pill { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; background: #e8f4e8; color: var(--mx-dark); }
+.diff-pill.warning { background: #fff3cd; color: #856404; }
+.diff-pill.balanced { background: #e8f4e8; color: var(--mx-dark); }
+.match-body { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; padding: 12px 14px; gap: 8px; }
+.match-side { display: flex; flex-direction: column; gap: 2px; }
+.match-side.right { text-align: right; }
+.match-player { font-size: 13px; font-weight: 500; }
+.match-hcp { font-size: 11px; color: var(--muted); }
+.match-vs-col { text-align: center; font-size: 11px; color: var(--muted); line-height: 1.4; }
+.match-footer { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+.btn-score { font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text); }
+.btn-score:active { background: var(--bg); }
+
+/* DAY SELECTOR */
+.day-selector { display: flex; gap: 8px; margin-bottom: 14px; }
+.day-btn { flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px; background: none; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.15s; }
+.day-btn.active { background: var(--text); color: white; border-color: var(--text); }
+
+/* SCORECARD */
+.match-selector { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: white; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; margin-bottom: 12px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.sc-table-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+.sc-table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 12px; }
+.sc-table th { padding: 6px 4px; text-align: center; background: var(--bg); border: 1px solid var(--border); font-weight: 600; font-size: 10px; color: var(--muted); }
+.sc-table td { padding: 4px 2px; text-align: center; border: 1px solid var(--border); }
+.sc-table td input { width: 30px; padding: 4px 2px; text-align: center; font-size: 13px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; -moz-appearance: textfield; }
+.sc-table td input::-webkit-inner-spin-button { display: none; }
+.sc-table td input:focus { background: #f0f8ff; border-radius: 4px; }
+.hole-sub { font-size: 9px; color: var(--muted); }
+.f9-col { background: #fff8e6 !important; }
+.tot-col { background: #e8f0fe !important; }
+.win-mx td { background: #e6f4ed !important; }
+.win-co td { background: #fffbea !important; }
+.pts-row td { background: #f8f8f8; }
+.adv-row td { background: #f0f4ff; font-size: 9px; color: #4466cc; font-weight: 600; }
+
+/* SUMMARY CARDS */
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.sum-card { background: var(--bg); border-radius: 10px; padding: 10px 8px; text-align: center; }
+.sum-label { font-size: 10px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.sum-scores { display: flex; justify-content: center; align-items: baseline; gap: 6px; }
+.sum-big { font-family: 'Bebas Neue', sans-serif; font-size: 26px; }
+.sum-dash { color: var(--muted); font-size: 14px; }
+.mx-color { color: var(--mx); }
+.co-color { color: var(--co-dark); }
+.winner-strip { text-align: center; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.winner-mx { background: var(--mx-light); color: var(--mx-dark); }
+.winner-co { background: var(--co-bg); color: var(--co-dark); }
+.winner-tie { background: var(--bg); color: var(--muted); }
+
+/* GENERAL TABLE */
+.gen-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.gen-table th { padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+.gen-table td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.gen-table tr:last-child td { border-bottom: none; }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.pill-mx { background: var(--mx-light); color: var(--mx-dark); }
+.pill-co { background: var(--co-bg); color: var(--co-dark); }
+.pill-tie { background: var(--bg); color: var(--muted); }
+.total-row { font-weight: 600; background: var(--bg); }
+.grand-total { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.gt-card { border-radius: var(--radius); padding: 16px; text-align: center; }
+.gt-mx { background: var(--mx); color: white; }
+.gt-co { background: var(--co); color: #5a4000; }
+.gt-flag { font-size: 28px; margin-bottom: 4px; }
+.gt-pts { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; }
+.gt-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+/* LOADING */
+.loading { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+.info-box { background: #e8f4fd; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #1a6496; margin-bottom: 12px; }
+.error-box { background: #fde; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #c00; margin-bottom: 12px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.dot-green { background: #22c55e; }
+.dot-red { background: #ef4444; }
+
+/* SAVED INDICATOR */
+.saved-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--mx); font-weight: 500; padding: 4px 10px; background: var(--mx-light); border-radius: 20px; }
+
+@media (max-width: 380px) {
+  .scoreboard { gap: 4px; }
+  .team-pts { font-size: 32px; }
+  .section { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="tournament-title">Ryder Cup 🏌️</div>
+    <span class="live-badge" id="live-badge">LIVE</span>
+  </div>
+  <div class="scoreboard">
+    <div class="team-score">
+      <div class="team-flag">🇲🇽</div>
+      <div class="team-label">MÉXICO</div>
+      <div class="team-pts mx-pts" id="hdr-mx">0</div>
+    </div>
+    <div class="score-divider">—</div>
+    <div class="team-score">
+      <div class="team-flag">🇨🇴</div>
+      <div class="team-label">COLOMBIA</div>
+      <div class="team-pts co-pts" id="hdr-co">0</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('jugadores',this)">Jugadores</button>
+  <button class="tab" onclick="showTab('parejas',this)">Matches</button>
+  <button class="tab" onclick="showTab('score',this)">Scorecard</button>
+  <button class="tab" onclick="showTab('general',this)">General</button>
+  <button class="tab" onclick="showTab('salidas',this)">Salidas</button>
+  <button class="tab" onclick="showTab('clasif',this)">Clasificación</button>
+  <button class="tab" onclick="showTab('admin',this)">⚙️</button>
+</div>
+
+<!-- JUGADORES -->
+<div class="section active" id="tab-jugadores">
+  <div class="info-box" id="db-status">Conectando a base de datos...</div>
+  <div class="team-block">
+    <div class="team-header">
+      <div class="team-color-dot mx-dot"></div>
+      <span class="team-header-name" style="color:var(--mx)">México</span>
+      <span class="player-count" id="mx-count">0 jugadores</span>
+    </div>
+    <div id="mx-players"></div>
+    <button class="add-btn" onclick="addPlayer('mx')">+ Agregar jugador</button>
+  </div>
+  <div class="team-block">
+    <div class="team-header">
+      <div class="team-color-dot co-dot"></div>
+      <span class="team-header-name" style="color:var(--co-dark)">Colombia</span>
+      <span class="player-count" id="co-count">0 jugadores</span>
+    </div>
+    <div id="co-players"></div>
+    <button class="add-btn" onclick="addPlayer('co')">+ Agregar jugador</button>
+  </div>
+  <button class="btn-main" onclick="savePlayers()">Guardar jugadores</button>
+  <button class="btn-main btn-outline" style="margin-top:8px" onclick="generatePairings()">Generar emparejamientos →</button>
+  <!-- Reset buttons hidden - admin only via console -->
+</div>
+
+<!-- MATCHES -->
+<div class="section" id="tab-parejas">
+  <div class="day-selector">
+    <button class="day-btn active" id="d1btn" onclick="setDay(1)">Día 1 — Parejas</button>
+    <button class="day-btn" id="d2btn" onclick="setDay(2)">Día 2 — Individual</button>
+  </div>
+  <div id="matches-container"><div class="loading">Cargando matches...</div></div>
+</div>
+
+<!-- SCORECARD -->
+<div class="section" id="tab-score">
+  <div class="day-selector">
+    <button class="day-btn active" id="sd1btn" onclick="setScorecardDay(1)">Día 1</button>
+    <button class="day-btn" id="sd2btn" onclick="setScorecardDay(2)">Día 2</button>
+  </div>
+  <select class="match-selector" id="match-sel" onchange="loadScorecard()">
+    <option value="">Selecciona un match...</option>
+  </select>
+  <div id="scorecard-area"></div>
+</div>
+
+<!-- GENERAL -->
+<div class="section" id="tab-general">
+  <div id="general-area"><div class="loading">Cargando tabla general...</div></div>
+  <div style="margin-top:16px;">
+    <button onclick="openDeleteModal()" style="width:100%;padding:12px;border:1.5px solid #c00;border-radius:12px;background:none;color:#c00;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑 Borrar todos los scores</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="section" id="tab-admin">
+  <div id="admin-lock" style="text-align:center;padding:40px 20px;">
+    <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+    <div style="font-size:15px;font-weight:500;margin-bottom:16px;">Panel de Administrador</div>
+    <input id="admin-pwd-input" type="password" placeholder="Contraseña" style="width:100%;max-width:280px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;" />
+    <div id="admin-pwd-error" style="font-size:12px;color:#c00;margin-bottom:8px;display:none;">Contraseña incorrecta</div>
+    <button onclick="unlockAdmin()" class="btn-main" style="max-width:280px;margin:0 auto;">Entrar</button>
+  </div>
+  <div id="admin-panel" style="display:none;">
+    <div class="info-box" style="margin-bottom:12px;">Panel de administrador — cambios se guardan en Firebase automáticamente.</div>
+    
+    <!-- Cambiar jugador en match -->
+    <div class="card">
+      <div class="card-title">Cambiar jugador en un match</div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px;color:var(--muted);font-weight:500;">Día</label>
+        <select id="adm-day" onchange="admLoadMatches()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;">
+          <option value="1">Día 1 — Parejas</option>
+          <option value="2">Día 2 — Individual</option>
+        </select>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px;color:var(--muted);font-weight:500;">Match</label>
+        <select id="adm-match" onchange="admLoadPlayers()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;">
+          <option value="">Selecciona match...</option>
+        </select>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px;color:var(--muted);font-weight:500;">Jugador a reemplazar</label>
+        <select id="adm-player" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;">
+          <option value="">Selecciona jugador...</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Nuevo jugador</label>
+          <input id="adm-new-name" type="text" placeholder="Nombre completo" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">HCP</label>
+          <input id="adm-new-hcp" type="number" min="0" max="54" placeholder="HCP" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Marcas</label>
+          <select id="adm-new-marks" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;">
+            <option value="Azules">Azules</option>
+            <option value="Blancas">Blancas</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="admReplacePlayer()" class="btn-main">Reemplazar jugador</button>
+      <div id="adm-match-msg" style="font-size:12px;margin-top:8px;"></div>
+    </div>
+
+    <!-- Cambiar HCP de jugador -->
+    <div class="card">
+      <div class="card-title">Actualizar handicap de jugador</div>
+      <div style="display:grid;grid-template-columns:1fr 80px;gap:8px;margin-bottom:10px;">
+        <div>
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Jugador</label>
+          <select id="adm-hcp-player" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;">
+            <option value="">Selecciona jugador...</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Nuevo HCP</label>
+          <input id="adm-hcp-val" type="number" min="0" max="54" step="0.1" placeholder="HCP" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;margin-top:4px;" />
+        </div>
+      </div>
+      <button onclick="admUpdateHcp()" class="btn-main">Actualizar HCP</button>
+      <div id="adm-hcp-msg" style="font-size:12px;margin-top:8px;"></div>
+    </div>
+
+    <!-- Reset pairings -->
+    <div class="card">
+      <div class="card-title">Acciones rápidas</div>
+      <button onclick="resetPairings()" class="btn-main btn-outline" style="margin-bottom:8px;">🔄 Resetear emparejamientos oficiales</button>
+      <button onclick="resetPlayers()" class="btn-main btn-outline" style="margin-bottom:8px;">🔄 Resetear lista oficial de jugadores</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLASIFICACION INDIVIDUAL -->
+<div class="section" id="tab-clasif">
+  <div class="day-selector" style="display:grid;grid-template-columns:repeat(3,1fr);">
+    <button class="day-btn active" id="cl1btn" onclick="setClasifDay(1)">Día 1</button>
+    <button class="day-btn" id="cl2btn" onclick="setClasifDay(2)">Día 2</button>
+    <button class="day-btn" id="cl3btn" onclick="setClasifDay(3)">Torneo</button>
+  </div>
+  <div id="clasif-area"></div>
+</div>
+
+<!-- SALIDAS -->
+<div class="section" id="tab-salidas">
+  <div class="day-selector">
+    <button class="day-btn" id="sal1btn" onclick="setSalidasDay(1)">Día 1 — Parejas</button>
+    <button class="day-btn active" id="sal2btn" onclick="setSalidasDay(2)">Día 2 — Individual</button>
+  </div>
+  <div id="salidas-area"></div>
+</div>
+
+<!-- Modal borrar scores -->
+<div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;padding:24px;margin:20px;width:100%;max-width:340px;">
+    <div style="font-size:16px;font-weight:600;margin-bottom:6px;">🔒 Borrar todos los scores</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Esta acción no se puede deshacer. Ingresa la contraseña para continuar.</div>
+    <input id="delete-pwd" type="password" placeholder="Contraseña" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;" />
+    <div id="delete-error" style="font-size:12px;color:#c00;margin-bottom:10px;display:none;">Contraseña incorrecta</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeDeleteModal()" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;background:none;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;">Cancelar</button>
+      <button onclick="confirmDelete()" style="flex:1;padding:10px;border:none;border-radius:10px;background:#c00;color:white;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Borrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAAm7U5vfLRY4p5ilLc7c7UN6nMlD5JniU",
+  authDomain: "ryder-mexico-vs-colombia.firebaseapp.com",
+  projectId: "ryder-mexico-vs-colombia",
+  storageBucket: "ryder-mexico-vs-colombia.firebasestorage.app",
+  messagingSenderId: "929000935921",
+  appId: "1:929000935921:web:4a47ad0a7023909b033450"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ---- STATE ----
+let state = {
+  players: { mx: [], co: [] },
+  pairings: { 1: [], 2: [] },
+  scores: {},
+  currentDay: 1,
+  scorecardDay: 1,
+};
+
+const HCP_HOLES = [17,9,13,1,5,11,7,15,3,14,8,6,12,4,10,2,18,16];
+  const PAR_HOLES  = [4,3,4,5,4,3,4,5,4,4,3,5,3,4,5,5,3,4];
+function holeIdx(h) { return HCP_HOLES[h-1]; }
+  function holePar(h) { return PAR_HOLES[h-1]; }
+
+// ---- DB STATUS ----
+function setStatus(ok, msg) {
+  const el = document.getElementById('db-status');
+  el.className = ok ? 'info-box' : 'error-box';
+  el.innerHTML = `<span class="status-dot ${ok?'dot-green':'dot-red'}"></span>${msg}`;
+}
+
+// ---- TABS ----
+window.showTab = function(name, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='general') renderGeneral();
+  if(name==='score') populateMatchSel();
+  if(name==='parejas') renderMatches();
+  if(name==='clasif') renderClasif();
+}
+
+// ---- PLAYERS ----
+function renderPlayers() {
+  ['mx','co'].forEach(team => {
+    const cont = document.getElementById(team+'-players');
+    cont.innerHTML = '';
+    state.players[team].forEach((p,i) => {
+      const row = document.createElement('div');
+      row.className = 'player-row';
+      const marksColor = p.marks==='Azules'?'#1a6fcf':'#888';
+      row.innerHTML = `
+        <input type="text" placeholder="Nombre del jugador" value="${p.name||''}" onchange="updateP('${team}',${i},'name',this.value)" />
+        <div class="hcp-wrap" onclick="unlockHcp(this,'${team}',${i})">
+          <input type="number" min="0" max="54" value="${p.hcp??18}" onchange="updateP('${team}',${i},'hcp',+this.value)" readonly style="cursor:pointer;opacity:0.8" id="hcpinput-${team}-${i}" />
+          <span class="hcp-label">🔒</span>
+        </div>
+        ${p.marks?`<span style="font-size:10px;font-weight:600;color:${marksColor};background:${p.marks==='Azules'?'#e8f0fe':'#f5f5f5'};padding:3px 7px;border-radius:8px;white-space:nowrap">${p.marks}</span>`:''}
+        <button class="remove-btn" onclick="removeP('${team}',${i})">×</button>`;
+      cont.appendChild(row);
+    });
+    document.getElementById(team+'-count').textContent = state.players[team].length + ' jugadores';
+  });
+}
+
+window.updateP = (t,i,f,v) => { state.players[t][i][f]=v; };
+window.removeP = (t,i) => { state.players[t].splice(i,1); renderPlayers(); };
+window.addPlayer = (t) => { state.players[t].push({name:'',hcp:18}); renderPlayers(); };
+
+window.savePlayers = async function() {
+  try {
+    await setDoc(doc(db,'torneo','players'), { mx: state.players.mx, co: state.players.co });
+    syncHcpToPairings();
+    renderMatches();
+    renderClasif();
+    setStatus(true, 'Jugadores guardados correctamente ✓');
+  } catch(e) { setStatus(false, 'Error al guardar: '+e.message); }
+}
+
+// ---- PAIRINGS ----
+function pairHcp(players) {
+  if(!players.length) return 0;
+  return players.reduce((s,p)=>s+(+p.hcp||0),0)/players.length;
+}
+
+// ---- SYNC HCP FROM PLAYERS TO PAIRINGS ----
+function syncHcpToPairings() {
+  const allPlayers = [...state.players.mx, ...state.players.co];
+  const findHcp = name => {
+    const p = allPlayers.find(p => p.name === name);
+    return p ? p.hcp : null;
+  };
+  [1,2].forEach(day => {
+    (state.pairings[day]||[]).forEach(m => {
+      [...m.mx, ...m.co].forEach(p => {
+        const h = findHcp(p.name);
+        if(h !== null) p.hcp = h;
+      });
+    });
+  });
+  // Sync salidas too
+  [1,2].forEach(day => {
+    (SALIDAS[day]||[]).forEach(s => {
+      s.grupos.forEach(g => {
+        [...g.mx, ...g.co].forEach(p => {
+          const h = findHcp(p.name);
+          if(h !== null) p.hcp = h;
+        });
+      });
+    });
+  });
+}
+
+function enforceFixedPairs() {
+  const d1 = state.pairings[1];
+  if(!d1 || !d1.length) return;
+  // Check if match 1 already has Timio+Iñaki
+  const m0 = d1[0];
+  const hasTimio = m0?.mx?.some(p=>p.name==='Timio Fernandez');
+  const hasInaki = m0?.mx?.some(p=>p.name==='Iñaki Fernandez');
+  if(hasTimio && hasInaki) return; // already correct
+  // Find Timio and Iñaki wherever they are and rebuild match 1
+  const timio = state.players.mx.find(p=>p.name==='Timio Fernandez');
+  const inaki = state.players.mx.find(p=>p.name==='Iñaki Fernandez');
+  const miguel = state.players.co.find(p=>p.name==='Miguel Henao');
+  const sebas = state.players.co.find(p=>p.name==='Sebastian Sarmiento');
+  if(!timio||!inaki||!miguel||!sebas) return;
+  // Remove them from wherever they appear in current matches
+  state.pairings[1] = state.pairings[1].map(m=>({
+    ...m,
+    mx: m.mx.filter(p=>p.name!=='Timio Fernandez'&&p.name!=='Iñaki Fernandez'),
+    co: m.co.filter(p=>p.name!=='Miguel Henao'&&p.name!=='Sebastian Sarmiento'),
+  })).filter(m=>m.mx.length>0||m.co.length>0);
+  // Insert fixed match at position 0
+  state.pairings[1].unshift({ id:'d1m0', day:1, mx:[timio,inaki], co:[miguel,sebas] });
+  // Re-index ids
+  state.pairings[1] = state.pairings[1].map((m,i)=>({...m, id:`d1m${i}`}));
+}
+
+window.generatePairings = async function() {
+  // PAREJA FIJA: Timio + Iñaki siempre juntos en match 1
+  const FIXED_MX = ['Timio Fernandez', 'Iñaki Fernandez'];
+  const FIXED_CO = ['Miguel Henao', 'Sebastian Sarmiento'];
+
+  // Separar jugadores fijos del resto
+  const mxFixed = state.players.mx.filter(p => FIXED_MX.includes(p.name));
+  const mxRest  = [...state.players.mx.filter(p => !FIXED_MX.includes(p.name))].sort((a,b)=>a.hcp-b.hcp);
+  const coFixed = state.players.co.filter(p => FIXED_CO.includes(p.name));
+  const coRest  = [...state.players.co.filter(p => !FIXED_CO.includes(p.name))].sort((a,b)=>a.hcp-b.hcp);
+
+  // Day 1: pareja fija primero, luego bajo+alto del resto
+  const day1 = [];
+  if(mxFixed.length===2 && coFixed.length===2) {
+    day1.push({ id:'d1m0', day:1, mx:mxFixed, co:coFixed });
+  }
+  const mxPairs=[], coPairs=[];
+  for(let i=0;i<mxRest.length-1;i+=2) mxPairs.push([mxRest[i], mxRest[mxRest.length-1-Math.floor(i/2)]]);
+  for(let i=0;i<coRest.length-1;i+=2) coPairs.push([coRest[i], coRest[coRest.length-1-Math.floor(i/2)]]);
+  const np = Math.min(mxPairs.length, coPairs.length);
+  // Match remaining pairs by closest average handicap
+  const coUsed = new Array(coPairs.length).fill(false);
+  for(let i=0;i<np;i++) {
+    const mxAvg = (mxPairs[i][0].hcp + mxPairs[i][1].hcp) / 2;
+    let best=-1, bestDiff=999;
+    for(let j=0;j<coPairs.length;j++) {
+      if(coUsed[j]) continue;
+      const coAvg = (coPairs[j][0].hcp + coPairs[j][1].hcp) / 2;
+      const d = Math.abs(mxAvg - coAvg);
+      if(d < bestDiff) { bestDiff=d; best=j; }
+    }
+    if(best>=0) {
+      coUsed[best]=true;
+      day1.push({ id:`d1m${i+1}`, day:1, mx:mxPairs[i], co:coPairs[best] });
+    }
+  }
+
+  // Day 2: individual ranked, Timio vs Miguel primero
+  const mxAll = [
+    ...state.players.mx.filter(p=>p.name==='Timio Fernandez'),
+    ...state.players.mx.filter(p=>p.name!=='Timio Fernandez').sort((a,b)=>a.hcp-b.hcp)
+  ];
+  const coAll = [
+    ...state.players.co.filter(p=>p.name==='Miguel Henao'),
+    ...state.players.co.filter(p=>p.name!=='Miguel Henao').sort((a,b)=>a.hcp-b.hcp)
+  ];
+  const day2 = [];
+  const n2 = Math.min(mxAll.length, coAll.length);
+  for(let i=0;i<n2;i++) day2.push({ id:`d2m${i}`, day:2, mx:[mxAll[i]], co:[coAll[i]] });
+
+  state.pairings[1] = day1;
+  state.pairings[2] = day2;
+
+  try {
+    await setDoc(doc(db,'torneo','pairings'), { day1, day2 });
+    renderMatches();
+    populateMatchSel();
+    document.querySelectorAll('.tab')[1].click();
+  } catch(e) { alert('Error al guardar emparejamientos: '+e.message); }
+}
+
+// ---- RENDER MATCHES ----
+function renderMatches() {
+  const d = state.currentDay;
+  const matches = state.pairings[d]||[];
+  const cont = document.getElementById('matches-container');
+  if(!matches.length) {
+    cont.innerHTML = '<div class="loading">Configura jugadores y genera emparejamientos primero.</div>';
+    return;
+  }
+  cont.innerHTML = '';
+  matches.forEach((m,mi) => {
+    const mxH = Math.round(pairHcp(m.mx)*10)/10;
+    const coH = Math.round(pairHcp(m.co)*10)/10;
+    const diff = Math.abs(mxH-coH);
+    const favor = diff<1 ? 'Equilibrado' : mxH<coH ? `+${Math.round(diff)} ventajas a CO` : `+${Math.round(diff)} ventajas a MX`;
+    const pillClass = diff>8?'warning':diff<2?'balanced':'';
+    const sc = state.scores[m.id];
+    const res = sc?._result;
+
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `
+      <div class="match-card-header">
+        <span class="match-num">MATCH ${mi+1} ${d===1?'· PAREJAS':'· INDIVIDUAL'}</span>
+        <span class="diff-pill ${pillClass}">${favor}</span>
+      </div>
+      <div class="match-body">
+        <div class="match-side">
+          ${m.mx.map(p=>`<div class="match-player" style="color:var(--mx)">${p.name||'Sin nombre'}</div><div class="match-hcp">HCP ${p.hcp}${p.marks?` · <span style="color:${p.marks==='Azules'?'#1a6fcf':'#888'}">${p.marks}</span>`:''}</div>`).join('')}
+        </div>
+        <div class="match-vs-col">🇲🇽<br>vs<br>🇨🇴</div>
+        <div class="match-side right">
+          ${m.co.map(p=>`<div class="match-player" style="color:var(--co-dark)">${p.name||'Sin nombre'}</div><div class="match-hcp">HCP ${p.hcp}${p.marks?` · <span style="color:${p.marks==='Azules'?'#1a6fcf':'#888'}">${p.marks}</span>`:''}</div>`).join('')}
+        </div>
+      </div>
+      <div class="match-footer">
+        ${res ? `<span class="saved-badge">✓ ${res.mx}—${res.co}</span>` : ''}
+        <button class="btn-score" style="margin-left:auto" onclick="goScore('${m.id}',${d})">Ingresar score →</button>
+      </div>`;
+    cont.appendChild(card);
+  });
+}
+
+window.setDay = function(d) {
+  state.currentDay = d;
+  document.getElementById('d1btn').classList.toggle('active',d===1);
+  document.getElementById('d2btn').classList.toggle('active',d===2);
+  renderMatches();
+}
+
+window.setScorecardDay = function(d) {
+  state.scorecardDay = d;
+  document.getElementById('sd1btn').classList.toggle('active',d===1);
+  document.getElementById('sd2btn').classList.toggle('active',d===2);
+  populateMatchSel();
+  document.getElementById('scorecard-area').innerHTML='';
+}
+
+window.goScore = function(id, day) {
+  document.querySelectorAll('.tab')[2].click();
+  document.getElementById('sd1btn').classList.toggle('active',day===1);
+  document.getElementById('sd2btn').classList.toggle('active',day===2);
+  state.scorecardDay = day;
+  populateMatchSel();
+  setTimeout(()=>{ document.getElementById('match-sel').value=id; loadScorecard(); },50);
+}
+
+// ---- SCORECARD ----
+function populateMatchSel() {
+  const d = state.scorecardDay;
+  const sel = document.getElementById('match-sel');
+  sel.innerHTML = '<option value="">Selecciona un match...</option>';
+  (state.pairings[d]||[]).forEach((m,i) => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    const mxN = m.mx.map(p=>p.name||'?').join('/');
+    const coN = m.co.map(p=>p.name||'?').join('/');
+    opt.textContent = `Match ${i+1}: ${mxN} vs ${coN}`;
+    sel.appendChild(opt);
+  });
+}
+
+window.loadScorecard = function() {
+  const matchId = document.getElementById('match-sel').value;
+  const area = document.getElementById('scorecard-area');
+  if(!matchId){area.innerHTML='';return;}
+  const d = state.scorecardDay;
+  const m = (state.pairings[d]||[]).find(x=>x.id===matchId);
+  if(!m){area.innerHTML='';return;}
+  if(!state.scores[matchId]) state.scores[matchId] = buildEmptyScore(d);
+  renderScorecard(matchId, d, m);
+}
+
+function buildEmptyScore(day) {
+  const sc = { mx: Array(18).fill(''), co: Array(18).fill('') };
+  if(day===1){ sc.mx2=Array(18).fill(''); sc.co2=Array(18).fill(''); }
+  return sc;
+}
+
+function getHcpAdv(m) {
+  const mxH = Math.round(pairHcp(m.mx));
+  const coH = Math.round(pairHcp(m.co));
+  const diff = Math.abs(mxH-coH);
+  const favor = mxH<=coH ? 'co' : 'mx';
+  return {diff, favor};
+}
+
+function renderScorecard(matchId, day, m) {
+  const area = document.getElementById('scorecard-area');
+  const {diff, favor} = getHcpAdv(m);
+  const sc = state.scores[matchId];
+
+  const rows = day===1 ? [
+    {key:'mx', label:m.mx[0]?.name||'MX 1', team:'mx'},
+    {key:'mx2', label:m.mx[1]?.name||'MX 2', team:'mx'},
+    {key:'co', label:m.co[0]?.name||'CO 1', team:'co'},
+    {key:'co2', label:m.co[1]?.name||'CO 2', team:'co'},
+  ] : [
+    {key:'mx', label:m.mx[0]?.name||'México', team:'mx'},
+    {key:'co', label:m.co[0]?.name||'Colombia', team:'co'},
+  ];
+
+  let html = `<div class="sc-table-wrap"><table class="sc-table"><thead>`;
+  html += '<tr><th>Hoyo</th>';
+  for(let h=1;h<=9;h++) html+=`<th>${h}</th>`;
+  html+='<th class="f9-col">F9</th>';
+  for(let h=10;h<=18;h++) html+=`<th>${h}</th>`;
+  html+='<th class="tot-col">TOT</th></tr>';
+
+  // Par row
+  html += '<tr><th style="font-size:9px">Par</th>';
+  for(let h=1;h<=18;h++){
+    if(h===10) html+='<td class="f9-col" style="font-size:10px;font-weight:600">36</td>';
+    html+=`<td class="hole-sub" style="font-weight:600">${holePar(h)}</td>`;
+  }
+  html+='<td class="tot-col" style="font-size:10px;font-weight:600">72</td></tr>';
+
+  // Index row
+  html += '<tr><th style="font-size:9px">Índice</th>';
+  for(let h=1;h<=18;h++){
+    if(h===10) html+='<td class="f9-col"></td>';
+    html+=`<td class="hole-sub">${holeIdx(h)}</td>`;
+  }
+  html+='<td class="tot-col"></td></tr>';
+
+  // Advantage row
+  if(diff>0) {
+    html += `<tr class="adv-row"><th style="font-size:9px">+${diff} a ${favor.toUpperCase()}</th>`;
+    for(let h=1;h<=18;h++){
+      if(h===10) html+='<td class="f9-col"></td>';
+      html+=`<td>${holeIdx(h)<=diff?'▲':''}</td>`;
+    }
+    html+='<td class="tot-col"></td></tr>';
+  }
+  html += '</thead><tbody>';
+
+  rows.forEach(r => {
+    const vals = sc[r.key]||Array(18).fill('');
+    html+=`<tr id="row-${matchId}-${r.key}">`;
+    html+=`<td style="text-align:left;padding-left:6px;font-size:10px;font-weight:600;color:var(--${r.team==='mx'?'mx':'co-dark'})">${r.label}</td>`;
+    for(let h=1;h<=18;h++){
+      if(h===10) html+=`<td class="f9-col" id="f9-${matchId}-${r.key}" style="font-weight:600;font-size:11px"></td>`;
+      html+=`<td><input type="number" min="1" max="15" inputmode="numeric" value="${vals[h-1]||''}" onchange="updScore('${matchId}','${r.key}',${h-1},this.value,${day})" /></td>`;
+    }
+    html+=`<td class="tot-col" id="tot-${matchId}-${r.key}" style="font-weight:600;font-size:11px"></td>`;
+    html+='</tr>';
+  });
+
+  // Points row
+  html+=`<tr class="pts-row"><th style="text-align:left;padding-left:4px;font-size:9px">Puntos</th>`;
+  for(let h=1;h<=18;h++){
+    if(h===10) html+=`<td class="f9-col"></td>`;
+    html+=`<td id="hp-${matchId}-h${h}" style="font-size:9px;font-weight:600"></td>`;
+  }
+  html+=`<td class="tot-col"></td></tr>`;
+  html+='</tbody></table></div>';
+
+  html+=`<div class="summary-grid">
+    <div class="sum-card"><div class="sum-label">Front 9 · 1pt</div><div class="sum-scores"><span class="sum-big mx-color" id="sf9mx-${matchId}">0</span><span class="sum-dash">—</span><span class="sum-big co-color" id="sf9co-${matchId}">0</span></div></div>
+    <div class="sum-card"><div class="sum-label">Back 9 · 1pt</div><div class="sum-scores"><span class="sum-big mx-color" id="sb9mx-${matchId}">0</span><span class="sum-dash">—</span><span class="sum-big co-color" id="sb9co-${matchId}">0</span></div></div>
+    <div class="sum-card"><div class="sum-label">Total · 2pts</div><div class="sum-scores"><span class="sum-big mx-color" id="stmx-${matchId}">0</span><span class="sum-dash">—</span><span class="sum-big co-color" id="stco-${matchId}">0</span></div></div>
+  </div>`;
+  html+=`<div id="win-${matchId}" class="winner-strip"></div>`;
+  html+=`<button class="btn-main" onclick="saveScore('${matchId}',${day})">Guardar resultado en tiempo real</button>`;
+
+  area.innerHTML = html;
+  recalc(matchId, day, m);
+}
+
+window.updScore = function(matchId, key, hi, val, day) {
+  state.scores[matchId][key][hi] = val===''?'':+val;
+  const d = state.scorecardDay;
+  const m = (state.pairings[d]||[]).find(x=>x.id===matchId);
+  if(m) recalc(matchId, day, m);
+}
+
+function recalc(matchId, day, m) {
+  const sc = state.scores[matchId];
+  const {diff, favor} = getHcpAdv(m);
+  const keys = day===1?['mx','mx2','co','co2']:['mx','co'];
+
+  keys.forEach(k => {
+    const vals = sc[k]||[];
+    const f9 = vals.slice(0,9).reduce((s,v)=>s+(+v||0),0);
+    const b9 = vals.slice(9,18).reduce((s,v)=>s+(+v||0),0);
+    const ef = document.getElementById(`f9-${matchId}-${k}`);
+    const et = document.getElementById(`tot-${matchId}-${k}`);
+    if(ef) ef.textContent = f9||'';
+    if(et) et.textContent = (f9+b9)||'';
+  });
+
+  let ptsMx=0,ptsCo=0,f9mx=0,f9co=0,b9mx=0,b9co=0;
+  for(let h=1;h<=18;h++){
+    const hi=h-1;
+    const gets = holeIdx(h)<=diff;
+    let hMx=0,hCo=0;
+    if(day===1){
+      const mxL=sc.mx[hi]!==''?+sc.mx[hi]:null;
+      const mxH=sc.mx2?.[hi]!==''?+sc.mx2?.[hi]:null;
+      const coL=sc.co[hi]!==''?+sc.co[hi]:null;
+      const coH=sc.co2?.[hi]!==''?+sc.co2?.[hi]:null;
+      // Advantage applies ONLY to the highest hcp player of the receiving pair
+      // In our scorecard: mx2 = higher hcp mx player, co2 = higher hcp co player
+      // Low vs Low: no advantage adjustment
+      if(mxL!==null&&coL!==null){
+        if(mxL<coL)hMx++; else if(coL<mxL)hCo++;
+      }
+      // High vs High: advantage goes only to the high hcp player of the favored team
+      if(mxH!==null&&coH!==null){
+        const am=favor==='mx'&&gets?mxH-1:mxH;
+        const ac=favor==='co'&&gets?coH-1:coH;
+        if(am<ac)hMx++; else if(ac<am)hCo++;
+      }
+    } else {
+      const ms=sc.mx[hi]!==''?+sc.mx[hi]:null;
+      const cs=sc.co[hi]!==''?+sc.co[hi]:null;
+      if(ms!==null&&cs!==null){
+        const am=favor==='mx'&&gets?ms-1:ms;
+        const ac=favor==='co'&&gets?cs-1:cs;
+        if(am<ac)hMx++; else if(ac<am)hCo++;
+      }
+    }
+    const cell=document.getElementById(`hp-${matchId}-h${h}`);
+    if(cell){
+      cell.textContent=hMx>0?`+${hMx}MX`:hCo>0?`+${hCo}CO`:'';
+      const row=cell.parentElement;
+      row.className='pts-row';
+    }
+    ptsMx+=hMx;ptsCo+=hCo;
+    if(h<=9){f9mx+=hMx;f9co+=hCo;}else{b9mx+=hMx;b9co+=hCo;}
+  }
+
+  let fMx=0,fCo=0;
+  if(f9mx>f9co)fMx++;else if(f9co>f9mx)fCo++;
+  if(b9mx>b9co)fMx++;else if(b9co>b9mx)fCo++;
+  if(ptsMx>ptsCo){fMx+=2;}else if(ptsCo>ptsMx){fCo+=2;}else{fMx+=1;fCo+=1;}
+
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set(`sf9mx-${matchId}`,f9mx); set(`sf9co-${matchId}`,f9co);
+  set(`sb9mx-${matchId}`,b9mx); set(`sb9co-${matchId}`,b9co);
+  set(`stmx-${matchId}`,ptsMx); set(`stco-${matchId}`,ptsCo);
+
+  const wb=document.getElementById(`win-${matchId}`);
+  if(wb){
+    wb.className='winner-strip';
+    if(fMx>fCo){wb.classList.add('winner-mx');wb.textContent=`🇲🇽 México gana el match ${fMx}—${fCo} puntos`;}
+    else if(fCo>fMx){wb.classList.add('winner-co');wb.textContent=`🇨🇴 Colombia gana el match ${fCo}—${fMx} puntos`;}
+    else{wb.classList.add('winner-tie');wb.textContent=`Empate ${fMx}—${fCo} puntos`;}
+  }
+
+  state.scores[matchId]._result = {mx:fMx, co:fCo};
+  updateHeader();
+}
+
+window.saveScore = async function(matchId, day) {
+  const sc = state.scores[matchId];
+  if(!sc) return;
+  const btn = event.target;
+  btn.textContent = 'Guardando...';
+  try {
+    await setDoc(doc(db,'scores',matchId), { ...sc, day, updatedAt: Date.now() });
+    btn.textContent = '✓ Guardado en tiempo real';
+    setTimeout(()=>btn.textContent='Guardar resultado en tiempo real',2500);
+    renderMatches();
+    updateHeader();
+  } catch(e) { btn.textContent='Error — intentar de nuevo'; }
+}
+
+function updateHeader() {
+  let mx=0,co=0;
+  Object.values(state.scores).forEach(sc=>{ if(sc._result){mx+=sc._result.mx;co+=sc._result.co;} });
+  document.getElementById('hdr-mx').textContent=mx;
+  document.getElementById('hdr-co').textContent=co;
+}
+
+// ---- GENERAL ----
+function renderGeneral() {
+  const cont = document.getElementById('general-area');
+  let mx=0,co=0;
+  let html='';
+  [1,2].forEach(d=>{
+    const label=d===1?'Día 1 — Parejas':'Día 2 — Individual';
+    const matches=state.pairings[d]||[];
+    html+=`<div class="card"><div class="card-title">${label}</div>`;
+    if(!matches.length){html+='<p style="font-size:13px;color:var(--muted)">Sin matches.</p></div>';return;}
+    html+=`<table class="gen-table"><thead><tr><th>#</th><th>México</th><th>Colombia</th><th>Pts</th><th>Resultado</th></tr></thead><tbody>`;
+    let dMx=0,dCo=0;
+    matches.forEach((m,i)=>{
+      const r=state.scores[m.id]?._result;
+      if(r){dMx+=r.mx;dCo+=r.co;}
+      const mxN=m.mx.map(p=>p.name||'?').join('/');
+      const coN=m.co.map(p=>p.name||'?').join('/');
+      html+=`<tr>
+        <td style="font-weight:600">${i+1}</td>
+        <td style="color:var(--mx);font-size:11px">${mxN}</td>
+        <td style="color:var(--co-dark);font-size:11px">${coN}</td>
+        <td style="font-weight:600;font-size:13px">${r?`<span style="color:var(--mx)">${r.mx}</span>–<span style="color:var(--co-dark)">${r.co}</span>`:'—'}</td>
+        <td>${r?(r.mx>r.co?'<span class="pill pill-mx">MX</span>':r.co>r.mx?'<span class="pill pill-co">CO</span>':'<span class="pill pill-tie">Empate</span>'):'<span style="font-size:11px;color:var(--muted)">Pendiente</span>'}</td>
+      </tr>`;
+    });
+    html+=`<tr class="total-row"><td colspan="3" style="font-size:12px">Total día ${d}</td><td style="font-size:13px"><span style="color:var(--mx)">${dMx}</span>–<span style="color:var(--co-dark)">${dCo}</span></td><td>${dMx>dCo?'<span class="pill pill-mx">MX</span>':dCo>dMx?'<span class="pill pill-co">CO</span>':'<span class="pill pill-tie">—</span>'}</td></tr>`;
+    html+='</tbody></table></div>';
+    mx+=dMx;co+=dCo;
+  });
+
+  html+=`<div class="grand-total">
+    <div class="gt-card gt-mx"><div class="gt-flag">🇲🇽</div><div style="font-size:12px;font-weight:600;margin-bottom:4px">MÉXICO</div><div class="gt-pts">${mx}</div><div class="gt-label">puntos totales</div></div>
+    <div class="gt-card gt-co"><div class="gt-flag">🇨🇴</div><div style="font-size:12px;font-weight:600;margin-bottom:4px">COLOMBIA</div><div class="gt-pts">${co}</div><div class="gt-label">puntos totales</div></div>
+  </div>`;
+  cont.innerHTML=html;
+}
+
+// ---- LOAD FROM FIREBASE ----
+async function loadAll() {
+  try {
+    // Players
+    const pSnap = await getDoc(doc(db,'torneo','players'));
+    if(pSnap.exists()) {
+      const d = pSnap.data();
+      state.players.mx = d.mx||[];
+      state.players.co = d.co||[];
+    } else {
+      state.players = {
+      mx:[
+        {name:'Sebastian Jaramillo', hcp:0,    marks:'Azules'},
+        {name:'Timio Fernandez',      hcp:1,    marks:'Azules'},
+        {name:'Sebastian Velez',      hcp:1,    marks:'Azules'},
+        {name:'David Villamizar',     hcp:2,    marks:'Azules'},
+        {name:'Adrian Secades',       hcp:1.4,  marks:'Azules'},
+        {name:'Iñaki Fernandez',      hcp:3,    marks:'Azules'},
+        {name:'Eutimio Fernandez',    hcp:11.7, marks:'Blancas'},
+        {name:'Jerome Ballard',       hcp:13,   marks:'Blancas'},
+        {name:'Tony Rodriguez',       hcp:16,   marks:'Blancas'},
+        {name:'Radek Wolak',          hcp:13.3, marks:'Blancas'},
+        {name:'James Stout',          hcp:13,   marks:'Blancas'},
+        {name:'Luis Alvarez',         hcp:18,   marks:'Blancas'},
+        {name:'Eduardo Lopez',        hcp:19.3, marks:'Blancas'},
+        {name:'Alejandro Rodriguez',  hcp:23.1, marks:'Blancas'},
+      ],
+      co:[
+        {name:'Miguel Henao',         hcp:1,  marks:'Azules'},
+        {name:'Felipe Gonzalez',      hcp:1,  marks:'Azules'},
+        {name:'Sebastian Sarmiento',  hcp:3,  marks:'Azules'},
+        {name:'Santiago Isaza',       hcp:5,  marks:'Azules'},
+        {name:'Carlos Vargas',        hcp:7,  marks:'Azules'},
+        {name:'Nicolas Suarez',       hcp:9,  marks:'Azules'},
+        {name:'Giovani Builes',       hcp:12, marks:'Blancas'},
+        {name:'Miguel Duque',          hcp:12, marks:'Blancas'},
+        {name:'Andres Arrazola',      hcp:14, marks:'Blancas'},
+        {name:'Juan David Perez',     hcp:16, marks:'Blancas'},
+        {name:'Daniel Cadavid',       hcp:16, marks:'Blancas'},
+        {name:'Andres Vasquez',       hcp:16, marks:'Blancas'},
+        {name:'Jimmy Calderon',       hcp:18, marks:'Blancas'},
+        {name:'Luis Miguel Verbel',   hcp:36, marks:'Blancas'},
+      ]
+    };
+    }
+    renderPlayers();
+
+    // Pairings
+    const prSnap = await getDoc(doc(db,'torneo','pairings'));
+    if(prSnap.exists()) {
+      const d = prSnap.data();
+      state.pairings[1] = d.day1||[];
+      state.pairings[2] = d.day2||[];
+      // Always enforce fixed pair: Timio+Iñaki in match 1
+      syncHcpToPairings();
+      enforceFixedPairs();
+    } else {
+      const day1 = [
+        { id:'d1m0', day:1,
+          mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'},{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}],
+          co:[{name:'Miguel Henao',hcp:1,marks:'Azules'},{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+        { id:'d1m1', day:1,
+          mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'},{name:'Adrian Secades',hcp:1.4,marks:'Azules'}],
+          co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'},{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+        { id:'d1m2', day:1,
+          mx:[{name:'David Villamizar',hcp:2,marks:'Azules'},{name:'Luis Alvarez',hcp:18,marks:'Blancas'}],
+          co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'},{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+        { id:'d1m3', day:1,
+          mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'},{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}],
+          co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'},{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+        { id:'d1m4', day:1,
+          mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'},{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}],
+          co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'},{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+        { id:'d1m5', day:1,
+          mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'},{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}],
+          co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'},{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+        { id:'d1m6', day:1,
+          mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'},{name:'James Stout',hcp:13,marks:'Blancas'}],
+          co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'},{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+      ];
+      const day2 = [
+        { id:'d2m0',  day:2, mx:[{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}],         co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'}] },
+        { id:'d2m1',  day:2, mx:[{name:'Adrian Secades',hcp:1.4,marks:'Azules'}],        co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'}] },
+        { id:'d2m2',  day:2, mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'}],         co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'}] },
+        { id:'d2m3',  day:2, mx:[{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}], co:[{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+        { id:'d2m4',  day:2, mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'}],     co:[{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+        { id:'d2m5',  day:2, mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'}],        co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'}] },
+        { id:'d2m6',  day:2, mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'}],         co:[{name:'Miguel Henao',hcp:1,marks:'Azules'}] },
+        { id:'d2m7',  day:2, mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'}],        co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'}] },
+        { id:'d2m8',  day:2, mx:[{name:'David Villamizar',hcp:2,marks:'Azules'}],        co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'}] },
+        { id:'d2m9',  day:2, mx:[{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}],         co:[{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+        { id:'d2m10', day:2, mx:[{name:'James Stout',hcp:13,marks:'Blancas'}],           co:[{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+        { id:'d2m11', day:2, mx:[{name:'Luis Alvarez',hcp:18,marks:'Blancas'}],          co:[{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+        { id:'d2m12', day:2, mx:[{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}],       co:[{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+        { id:'d2m13', day:2, mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'}],   co:[{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+      ];
+      state.pairings[1] = day1;
+      state.pairings[2] = day2;
+    }
+
+    // Horarios
+    for(const day of [1,2]) {
+      try {
+        const hSnap = await getDoc(doc(db,'torneo',`horarios_dia${day}`));
+        if(hSnap.exists()) {
+          const horas = hSnap.data().horas || [];
+          horas.forEach((h,i) => { if(SALIDAS[day][i]) SALIDAS[day][i].hora = h; });
+        }
+      } catch(e) {}
+    }
+
+    // Scores
+    const scSnap = await getDocs(collection(db,'scores'));
+    scSnap.forEach(d=>{ state.scores[d.id]=d.data(); });
+    updateHeader();
+    setStatus(true, 'Conectado · los scores se sincronizan en tiempo real');
+  } catch(e) {
+    setStatus(false, 'Error de conexión: '+e.message);
+  }
+}
+
+// ---- REALTIME LISTENER ----
+function startRealtime() {
+  // Listen scores collection
+  const scoresRef = collection(db,'scores');
+  onSnapshot(scoresRef, snapshot => {
+    snapshot.docChanges().forEach(change => {
+      if(change.type==='modified'||change.type==='added') {
+        state.scores[change.doc.id] = change.doc.data();
+      }
+    });
+    updateHeader();
+    const activeTab = document.querySelector('.tab.active');
+    if(activeTab?.textContent.includes('General')) renderGeneral();
+    if(activeTab?.textContent.includes('Match')) renderMatches();
+  });
+
+  onSnapshot(doc(db,'torneo','pairings'), snap => {
+    if(snap.exists()){
+      const d=snap.data();
+      state.pairings[1]=d.day1||[];
+      state.pairings[2]=d.day2||[];
+      syncHcpToPairings();
+      enforceFixedPairs();
+      renderMatches();
+      populateMatchSel();
+    }
+  });
+
+  onSnapshot(doc(db,'torneo','players'), snap => {
+    if(snap.exists()){
+      const d=snap.data();
+      state.players.mx=d.mx||[];
+      state.players.co=d.co||[];
+      syncHcpToPairings();
+      enforceFixedPairs();
+      renderPlayers();
+      renderMatches();
+      renderClasif();
+    }
+  });
+}
+
+// ---- SALIDAS DATA ----
+const SALIDAS = {
+  1: [
+    { salida: 1, hora: '', grupos: [
+      { mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'},{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}], co:[{name:'Miguel Henao',hcp:1,marks:'Azules'},{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+      { mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'},{name:'Adrian Secades',hcp:1.4,marks:'Azules'}], co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'},{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+    ]},
+    { salida: 2, hora: '', grupos: [
+      { mx:[{name:'David Villamizar',hcp:2,marks:'Azules'},{name:'Luis Alvarez',hcp:18,marks:'Blancas'}], co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'},{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+      { mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'},{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}], co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'},{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+    ]},
+    { salida: 3, hora: '', grupos: [
+      { mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'},{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}], co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'},{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+      { mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'},{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}], co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'},{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+    ]},
+    { salida: 4, hora: '', grupos: [
+      { mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'},{name:'James Stout',hcp:13,marks:'Blancas'}], co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'},{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+    ]},
+  ],
+  2: [
+    { salida: 1, hora: '', grupos: [
+      { mx:[{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}], co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'}] },
+      { mx:[{name:'Adrian Secades',hcp:1.4,marks:'Azules'}], co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'}] },
+    ]},
+    { salida: 2, hora: '', grupos: [
+      { mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'}], co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'}] },
+      { mx:[{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}], co:[{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+    ]},
+    { salida: 3, hora: '', grupos: [
+      { mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'}], co:[{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+      { mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'}], co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'}] },
+    ]},
+    { salida: 4, hora: '', grupos: [
+      { mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'}], co:[{name:'Miguel Henao',hcp:1,marks:'Azules'}] },
+      { mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'}], co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'}] },
+    ]},
+    { salida: 5, hora: '', grupos: [
+      { mx:[{name:'David Villamizar',hcp:2,marks:'Azules'}], co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'}] },
+      { mx:[{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}], co:[{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+    ]},
+    { salida: 6, hora: '', grupos: [
+      { mx:[{name:'James Stout',hcp:13,marks:'Blancas'}], co:[{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+      { mx:[{name:'Luis Alvarez',hcp:18,marks:'Blancas'}], co:[{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+    ]},
+    { salida: 7, hora: '', grupos: [
+      { mx:[{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}], co:[{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+      { mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'}], co:[{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+    ]},
+  ]
+};
+
+let salidasDay = 2;
+window.setSalidasDay = function(d) {
+  salidasDay = d;
+  document.getElementById('sal1btn').classList.toggle('active', d===1);
+  document.getElementById('sal2btn').classList.toggle('active', d===2);
+  renderSalidas();
+}
+
+function renderSalidas() {
+  const cont = document.getElementById('salidas-area');
+  const data = SALIDAS[salidasDay];
+  let html = '';
+  data.forEach(s => {
+    const horaDisplay = s.hora ? `<span style="font-size:13px;font-weight:600;color:var(--text);background:var(--co);padding:3px 10px;border-radius:8px;">${s.hora}</span>` : `<span style="font-size:11px;color:var(--muted)">Sin horario</span>`;
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="card-title" style="margin:0">Salida ${s.salida}</div>
+        ${horaDisplay}
+      </div>`;
+    const mxPlayers = s.grupos.flatMap(g=>g.mx);
+    const coPlayers = s.grupos.flatMap(g=>g.co);
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div style="font-size:10px;font-weight:600;color:var(--mx);margin-bottom:6px;">🇲🇽 MÉXICO</div>`;
+    mxPlayers.forEach(p => {
+      const marksC = p.marks==='Azules'?'#1a6fcf':'#777';
+      html += `<div style="padding:6px 8px;background:var(--mx-light);border-radius:8px;margin-bottom:4px;">
+        <div style="font-size:12px;font-weight:600;color:var(--mx-dark)">${p.name}</div>
+        <div style="font-size:10px;color:var(--muted)">HCP ${p.hcp} · <span style="color:${marksC};font-weight:600">${p.marks||''}</span></div>
+      </div>`;
+    });
+    html += `</div><div><div style="font-size:10px;font-weight:600;color:var(--co-dark);margin-bottom:6px;">🇨🇴 COLOMBIA</div>`;
+    coPlayers.forEach(p => {
+      const marksC = p.marks==='Azules'?'#1a6fcf':'#777';
+      html += `<div style="padding:6px 8px;background:var(--co-bg);border-radius:8px;margin-bottom:4px;">
+        <div style="font-size:12px;font-weight:600;color:var(--co-dark)">${p.name}</div>
+        <div style="font-size:10px;color:var(--muted)">HCP ${p.hcp} · <span style="color:${marksC};font-weight:600">${p.marks||''}</span></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+    s.grupos.forEach((g,i) => {
+      const matchLabel = salidasDay===1 ? `Match: <span style="color:var(--mx);font-weight:500">${g.mx.map(p=>p.name).join(' + ')}</span> vs <span style="color:var(--co-dark);font-weight:500">${g.co.map(p=>p.name).join(' + ')}</span>` : `<span style="color:var(--mx);font-weight:500">${g.mx[0].name}</span> vs <span style="color:var(--co-dark);font-weight:500">${g.co[0].name}</span>`;
+      html += `<div style="margin-top:6px;padding:6px 8px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--muted);">${matchLabel}</div>`;
+    });
+    html += `</div>`;
+  });
+  // Admin horario editor
+  html += `<div style="margin-top:16px;"><button onclick="toggleHorarioEdit()" class="btn-outline btn-main" style="font-size:12px;padding:8px;">⏰ Editar horarios de salida</button></div>`;
+  html += `<div id="horario-editor" style="display:none;margin-top:12px;">`;
+  data.forEach((s,i) => {
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="font-size:13px;font-weight:500;min-width:70px;">Salida ${s.salida}:</span>
+      <input type="time" value="${s.hora||''}" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;" onchange="updateHora(${salidasDay},${i},this.value)" />
+    </div>`;
+  });
+  html += `</div>`;
+  cont.innerHTML = html;
+}
+
+window.toggleHorarioEdit = function() {
+  const pwd = prompt('Contraseña para editar horarios:');
+  if(pwd !== 'ryder2025') { if(pwd!==null) alert('Contraseña incorrecta'); return; }
+  const ed = document.getElementById('horario-editor');
+  ed.style.display = ed.style.display==='none' ? 'block' : 'none';
+}
+
+window.updateHora = async function(day, idx, val) {
+  SALIDAS[day][idx].hora = val;
+  try {
+    const horasKey = `horarios_dia${day}`;
+    const horas = SALIDAS[day].map(s=>s.hora||'');
+    await setDoc(doc(db,'torneo',horasKey), { horas });
+  } catch(e) { console.error(e); }
+  renderSalidas();
+}
+
+// ---- ADMIN PANEL ----
+const ADMIN_PASSWORD = 'ryder2025';
+let adminUnlocked = false;
+
+window.unlockAdmin = function() {
+  const pwd = document.getElementById('admin-pwd-input').value;
+  if(pwd !== ADMIN_PASSWORD) {
+    document.getElementById('admin-pwd-error').style.display = 'block';
+    return;
+  }
+  adminUnlocked = true;
+  document.getElementById('admin-lock').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  admPopulateHcpPlayers();
+  admLoadMatches();
+}
+
+window.admLoadMatches = function() {
+  const day = +document.getElementById('adm-day').value;
+  const sel = document.getElementById('adm-match');
+  sel.innerHTML = '<option value="">Selecciona match...</option>';
+  (state.pairings[day]||[]).forEach((m,i) => {
+    const mxN = m.mx.map(p=>p.name).join(' + ');
+    const coN = m.co.map(p=>p.name).join(' + ');
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `Match ${i+1}: ${mxN} vs ${coN}`;
+    sel.appendChild(opt);
+  });
+  document.getElementById('adm-player').innerHTML = '<option value="">Selecciona jugador...</option>';
+}
+
+window.admLoadPlayers = function() {
+  const day = +document.getElementById('adm-day').value;
+  const matchId = document.getElementById('adm-match').value;
+  const sel = document.getElementById('adm-player');
+  sel.innerHTML = '<option value="">Selecciona jugador...</option>';
+  const m = (state.pairings[day]||[]).find(x=>x.id===matchId);
+  if(!m) return;
+  [...m.mx, ...m.co].forEach((p,i) => {
+    const opt = document.createElement('option');
+    opt.value = JSON.stringify({name:p.name, team: i < m.mx.length ? 'mx' : 'co', idx: i < m.mx.length ? i : i - m.mx.length});
+    opt.textContent = `${p.name} (HCP ${p.hcp}) — ${i < m.mx.length ? '🇲🇽 MX' : '🇨🇴 CO'}`;
+    sel.appendChild(opt);
+  });
+}
+
+window.admReplacePlayer = async function() {
+  const day = +document.getElementById('adm-day').value;
+  const matchId = document.getElementById('adm-match').value;
+  const playerStr = document.getElementById('adm-player').value;
+  const newName = document.getElementById('adm-new-name').value.trim();
+  const newHcp = +document.getElementById('adm-new-hcp').value;
+  const newMarks = document.getElementById('adm-new-marks').value;
+  const msg = document.getElementById('adm-match-msg');
+
+  if(!matchId || !playerStr || !newName || !newHcp) {
+    msg.style.color='#c00'; msg.textContent='Completa todos los campos.'; return;
+  }
+
+  const {team, idx} = JSON.parse(playerStr);
+  const m = (state.pairings[day]||[]).find(x=>x.id===matchId);
+  if(!m) return;
+
+  // Replace in pairings
+  m[team][idx] = {name:newName, hcp:newHcp, marks:newMarks};
+
+  // Also replace in players list
+  const teamList = team==='mx' ? state.players.mx : state.players.co;
+  const oldPlayer = JSON.parse(playerStr);
+  const pi = teamList.findIndex(p=>p.name===oldPlayer.name);
+  if(pi>=0) teamList[pi] = {name:newName, hcp:newHcp, marks:newMarks};
+  else teamList.push({name:newName, hcp:newHcp, marks:newMarks});
+
+  // Also replace in salidas
+  [1,2].forEach(d => {
+    (SALIDAS[d]||[]).forEach(s => {
+      s.grupos.forEach(g => {
+        [g.mx, g.co].forEach(arr => {
+          arr.forEach((p,i) => { if(p.name===oldPlayer.name) arr[i]={name:newName,hcp:newHcp,marks:newMarks}; });
+        });
+      });
+    });
+  });
+
+  try {
+    await setDoc(doc(db,'torneo','pairings'), { day1: state.pairings[1], day2: state.pairings[2] });
+    await setDoc(doc(db,'torneo','players'), { mx: state.players.mx, co: state.players.co });
+    msg.style.color='var(--mx)'; msg.textContent=`✓ ${oldPlayer.name} reemplazado por ${newName}`;
+    admLoadMatches();
+    admPopulateHcpPlayers();
+    renderPlayers();
+    renderMatches();
+    renderSalidas();
+  } catch(e) { msg.style.color='#c00'; msg.textContent='Error: '+e.message; }
+}
+
+function admPopulateHcpPlayers() {
+  const sel = document.getElementById('adm-hcp-player');
+  sel.innerHTML = '<option value="">Selecciona jugador...</option>';
+  [...state.players.mx, ...state.players.co].forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.name;
+    opt.textContent = `${p.name} (HCP ${p.hcp})`;
+    sel.appendChild(opt);
+  });
+}
+
+window.admUpdateHcp = async function() {
+  const name = document.getElementById('adm-hcp-player').value;
+  const newHcp = +document.getElementById('adm-hcp-val').value;
+  const msg = document.getElementById('adm-hcp-msg');
+  if(!name || !newHcp && newHcp!==0) { msg.style.color='#c00'; msg.textContent='Selecciona jugador y HCP.'; return; }
+
+  // Update in players
+  const allTeams = [state.players.mx, state.players.co];
+  allTeams.forEach(t => { const p=t.find(p=>p.name===name); if(p) p.hcp=newHcp; });
+  // Sync to pairings and salidas
+  syncHcpToPairings();
+
+  try {
+    await setDoc(doc(db,'torneo','players'), { mx: state.players.mx, co: state.players.co });
+    await setDoc(doc(db,'torneo','pairings'), { day1: state.pairings[1], day2: state.pairings[2] });
+    msg.style.color='var(--mx)'; msg.textContent=`✓ HCP de ${name} actualizado a ${newHcp}`;
+    admPopulateHcpPlayers();
+    renderPlayers();
+    renderMatches();
+    renderClasif();
+  } catch(e) { msg.style.color='#c00'; msg.textContent='Error: '+e.message; }
+}
+
+// Hook showTab to init admin panel
+const _origShowTab = window.showTab;
+window.showTab = function(name, btn) {
+  _origShowTab(name, btn);
+  if(name==='admin' && adminUnlocked) { admLoadMatches(); admPopulateHcpPlayers(); }
+}
+
+// ---- HCP PASSWORD UNLOCK ----
+const HCP_PASSWORD = 'ryder2025';
+let hcpUnlocked = false;
+
+window.unlockHcp = function(wrap, team, idx) {
+  const input = document.getElementById(`hcpinput-${team}-${idx}`);
+  if(!input.readOnly) return; // already unlocked
+  if(hcpUnlocked) {
+    input.readOnly = false;
+    input.style.cursor = 'auto';
+    input.style.opacity = '1';
+    wrap.querySelector('.hcp-label').textContent = 'HCP';
+    input.focus();
+    return;
+  }
+  const pwd = prompt('Contraseña para editar handicap:');
+  if(pwd === HCP_PASSWORD) {
+    hcpUnlocked = true;
+    input.readOnly = false;
+    input.style.cursor = 'auto';
+    input.style.opacity = '1';
+    wrap.querySelector('.hcp-label').textContent = 'HCP';
+    input.focus();
+  } else if(pwd !== null) {
+    alert('Contraseña incorrecta');
+  }
+}
+
+// ---- RESET PLAYERS ----
+window.resetPlayers = async function() {
+  if(!confirm('¿Resetear la lista oficial de jugadores? Esto sobreescribirá los jugadores actuales en Firebase.')) return;
+  const official = {
+    mx:[
+      {name:'Sebastian Jaramillo', hcp:0,    marks:'Azules'},
+      {name:'Timio Fernandez',      hcp:1,    marks:'Azules'},
+      {name:'Sebastian Velez',      hcp:1,    marks:'Azules'},
+      {name:'David Villamizar',     hcp:2,    marks:'Azules'},
+      {name:'Adrian Secades',       hcp:1.4,  marks:'Azules'},
+      {name:'Iñaki Fernandez',      hcp:3,    marks:'Azules'},
+      {name:'Eutimio Fernandez',    hcp:11.7, marks:'Blancas'},
+      {name:'Jerome Ballard',       hcp:13,   marks:'Blancas'},
+      {name:'Tony Rodriguez',       hcp:16,   marks:'Blancas'},
+      {name:'Radek Wolak',          hcp:13.3, marks:'Blancas'},
+      {name:'James Stout',          hcp:13,   marks:'Blancas'},
+      {name:'Luis Alvarez',         hcp:18,   marks:'Blancas'},
+      {name:'Eduardo Lopez',        hcp:19.3, marks:'Blancas'},
+      {name:'Alejandro Rodriguez',  hcp:23.1, marks:'Blancas'},
+    ],
+    co:[
+      {name:'Miguel Henao',         hcp:1,  marks:'Azules'},
+      {name:'Felipe Gonzalez',      hcp:1,  marks:'Azules'},
+      {name:'Sebastian Sarmiento',  hcp:3,  marks:'Azules'},
+      {name:'Santiago Isaza',       hcp:5,  marks:'Azules'},
+      {name:'Carlos Vargas',        hcp:7,  marks:'Azules'},
+      {name:'Nicolas Suarez',       hcp:9,  marks:'Azules'},
+      {name:'Giovani Builes',       hcp:12, marks:'Blancas'},
+      {name:'Miguel Duque',          hcp:12, marks:'Blancas'},
+      {name:'Andres Arrazola',      hcp:14, marks:'Blancas'},
+      {name:'Juan David Perez',     hcp:16, marks:'Blancas'},
+      {name:'Daniel Cadavid',       hcp:16, marks:'Blancas'},
+      {name:'Andres Vasquez',       hcp:16, marks:'Blancas'},
+      {name:'Jimmy Calderon',       hcp:18, marks:'Blancas'},
+      {name:'Luis Miguel Verbel',   hcp:36, marks:'Blancas'},
+    ]
+  };
+  try {
+    await setDoc(doc(db,'torneo','players'), official);
+    state.players = official;
+    renderPlayers();
+    setStatus(true, 'Lista oficial restaurada correctamente ✓');
+  } catch(e) {
+    setStatus(false, 'Error al resetear: ' + e.message);
+  }
+}
+
+// ---- RESET PAIRINGS ----
+window.resetPairings = async function() {
+  if(!confirm('¿Resetear los emparejamientos oficiales? Esto sobreescribirá los matches actuales en Firebase.')) return;
+  const day1 = [
+    { id:'d1m0', day:1, mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'},{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}], co:[{name:'Miguel Henao',hcp:1,marks:'Azules'},{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+    { id:'d1m1', day:1, mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'},{name:'Adrian Secades',hcp:1.4,marks:'Azules'}], co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'},{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+    { id:'d1m2', day:1, mx:[{name:'David Villamizar',hcp:2,marks:'Azules'},{name:'Luis Alvarez',hcp:18,marks:'Blancas'}], co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'},{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+    { id:'d1m3', day:1, mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'},{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}], co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'},{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+    { id:'d1m4', day:1, mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'},{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}], co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'},{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+    { id:'d1m5', day:1, mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'},{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}], co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'},{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+    { id:'d1m6', day:1, mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'},{name:'James Stout',hcp:13,marks:'Blancas'}], co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'},{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+  ];
+  const day2 = [
+    { id:'d2m0',  day:2, mx:[{name:'Iñaki Fernandez',hcp:3,marks:'Azules'}],         co:[{name:'Nicolas Suarez',hcp:9,marks:'Azules'}] },
+    { id:'d2m1',  day:2, mx:[{name:'Adrian Secades',hcp:1.4,marks:'Azules'}],        co:[{name:'Carlos Vargas',hcp:7,marks:'Azules'}] },
+    { id:'d2m2',  day:2, mx:[{name:'Timio Fernandez',hcp:1,marks:'Azules'}],         co:[{name:'Felipe Gonzalez',hcp:1,marks:'Azules'}] },
+    { id:'d2m3',  day:2, mx:[{name:'Alejandro Rodriguez',hcp:23.1,marks:'Blancas'}], co:[{name:'Daniel Cadavid',hcp:16,marks:'Blancas'}] },
+    { id:'d2m4',  day:2, mx:[{name:'Sebastian Jaramillo',hcp:0,marks:'Azules'}],     co:[{name:'Sebastian Sarmiento',hcp:3,marks:'Azules'}] },
+    { id:'d2m5',  day:2, mx:[{name:'Jerome Ballard',hcp:13,marks:'Blancas'}],        co:[{name:'Miguel Duque',hcp:12,marks:'Blancas'}] },
+    { id:'d2m6',  day:2, mx:[{name:'Sebastian Velez',hcp:1,marks:'Azules'}],         co:[{name:'Miguel Henao',hcp:1,marks:'Azules'}] },
+    { id:'d2m7',  day:2, mx:[{name:'Tony Rodriguez',hcp:16,marks:'Blancas'}],        co:[{name:'Andres Arrazola',hcp:14,marks:'Blancas'}] },
+    { id:'d2m8',  day:2, mx:[{name:'David Villamizar',hcp:2,marks:'Azules'}],        co:[{name:'Santiago Isaza',hcp:5,marks:'Azules'}] },
+    { id:'d2m9',  day:2, mx:[{name:'Radek Wolak',hcp:13.3,marks:'Blancas'}],         co:[{name:'Juan David Perez',hcp:16,marks:'Blancas'}] },
+    { id:'d2m10', day:2, mx:[{name:'James Stout',hcp:13,marks:'Blancas'}],           co:[{name:'Luis Miguel Verbel',hcp:36,marks:'Blancas'}] },
+    { id:'d2m11', day:2, mx:[{name:'Luis Alvarez',hcp:18,marks:'Blancas'}],          co:[{name:'Andres Vasquez',hcp:16,marks:'Blancas'}] },
+    { id:'d2m12', day:2, mx:[{name:'Eduardo Lopez',hcp:19.3,marks:'Blancas'}],       co:[{name:'Jimmy Calderon',hcp:18,marks:'Blancas'}] },
+    { id:'d2m13', day:2, mx:[{name:'Eutimio Fernandez',hcp:11.7,marks:'Blancas'}],   co:[{name:'Giovani Builes',hcp:12,marks:'Blancas'}] },
+  ];
+  try {
+    await setDoc(doc(db,'torneo','pairings'), { day1, day2 });
+    state.pairings[1] = day1;
+    state.pairings[2] = day2;
+    renderMatches();
+    populateMatchSel();
+    setStatus(true, 'Emparejamientos oficiales restaurados correctamente ✓');
+  } catch(e) {
+    setStatus(false, 'Error al resetear: ' + e.message);
+  }
+}
+
+// ---- DELETE SCORES ----
+const DELETE_PASSWORD = 'ryder2025';
+
+window.openDeleteModal = function() {
+  document.getElementById('delete-modal').style.display = 'flex';
+  document.getElementById('delete-pwd').value = '';
+  document.getElementById('delete-error').style.display = 'none';
+  setTimeout(()=>document.getElementById('delete-pwd').focus(), 100);
+}
+
+window.closeDeleteModal = function() {
+  document.getElementById('delete-modal').style.display = 'none';
+}
+
+window.confirmDelete = async function() {
+  const pwd = document.getElementById('delete-pwd').value;
+  if(pwd !== DELETE_PASSWORD) {
+    document.getElementById('delete-error').style.display = 'block';
+    return;
+  }
+  closeDeleteModal();
+  try {
+    const { deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const scSnap = await getDocs(collection(db,'scores'));
+    const delPromises = [];
+    scSnap.forEach(d => delPromises.push(deleteDoc(doc(db,'scores',d.id))));
+    await Promise.all(delPromises);
+    state.scores = {};
+    updateHeader();
+    renderGeneral();
+    renderMatches();
+    alert('Todos los scores han sido borrados.');
+  } catch(e) {
+    alert('Error al borrar: ' + e.message);
+  }
+}
+
+// Close modal on background click
+document.getElementById('delete-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeDeleteModal();
+});
+
+// ---- CLASIFICACION INDIVIDUAL ----
+let clasifDay = 1;
+
+window.setClasifDay = function(d) {
+  clasifDay = d;
+  document.getElementById('cl1btn').classList.toggle('active', d===1);
+  document.getElementById('cl2btn').classList.toggle('active', d===2);
+  document.getElementById('cl3btn').classList.toggle('active', d===3);
+  renderClasif();
+}
+
+function getPlayerScores(day) {
+  const results = [];
+  const matches = state.pairings[day] || [];
+  matches.forEach(m => {
+    const sc = state.scores[m.id];
+    if(!sc) return;
+    // Build player list with their score key
+    const players = [];
+    if(day === 1) {
+      if(m.mx[0]) players.push({ player: m.mx[0], key: 'mx',  team: 'mx' });
+      if(m.mx[1]) players.push({ player: m.mx[1], key: 'mx2', team: 'mx' });
+      if(m.co[0]) players.push({ player: m.co[0], key: 'co',  team: 'co' });
+      if(m.co[1]) players.push({ player: m.co[1], key: 'co2', team: 'co' });
+    } else {
+      if(m.mx[0]) players.push({ player: m.mx[0], key: 'mx', team: 'mx' });
+      if(m.co[0]) players.push({ player: m.co[0], key: 'co', team: 'co' });
+    }
+    players.forEach(({ player, key, team }) => {
+      const vals = sc[key] || [];
+      const gross = vals.reduce((s, v) => s + (+v || 0), 0);
+      if(gross === 0) return; // no score entered yet
+      const hcp80 = Math.round(player.hcp * 0.8);
+      const neto = gross - hcp80;
+      results.push({ name: player.name, hcp: player.hcp, hcp80, gross, neto, team });
+    });
+  });
+  return results.sort((a, b) => a.neto - b.neto);
+}
+
+function getPlayerScoresBothDays() {
+  const d1 = getPlayerScores(1);
+  const d2 = getPlayerScores(2);
+  // Merge by player name
+  const map = {};
+  d1.forEach(p => {
+    map[p.name] = { name: p.name, hcp: p.hcp, hcp80: p.hcp80, team: p.team, gross: p.gross, neto: p.neto, days: 1 };
+  });
+  d2.forEach(p => {
+    if(map[p.name]) {
+      map[p.name].gross += p.gross;
+      map[p.name].neto += p.neto;
+      map[p.name].days += 1;
+    } else {
+      map[p.name] = { name: p.name, hcp: p.hcp, hcp80: p.hcp80, team: p.team, gross: p.gross, neto: p.neto, days: 1 };
+    }
+  });
+  return Object.values(map).sort((a, b) => a.neto - b.neto);
+}
+
+function renderClasif() {
+  const cont = document.getElementById('clasif-area');
+  const dayLabels = { 1: 'Día 1 — Parejas', 2: 'Día 2 — Individual', 3: 'Torneo Completo' };
+  const players = clasifDay === 3 ? getPlayerScoresBothDays() : getPlayerScores(clasifDay);
+
+  if(!players.length) {
+    cont.innerHTML = '<div class="loading">No hay scores ingresados aún.</div>';
+    return;
+  }
+
+  const winner = players[0];
+  let html = '';
+
+  // Winner banner
+  html += `<div class="winner-strip ${winner.team==='mx'?'winner-mx':'winner-co'}" style="margin-bottom:12px;font-size:15px;">
+    🏆 ${winner.name} — Neto ${winner.neto}
+  </div>`;
+
+  // Table
+  html += `<div class="card" style="padding:0;overflow:hidden;">
+    <table class="gen-table" style="margin:0;">
+      <thead><tr>
+        <th style="padding:10px 8px;">#</th>
+        <th>Jugador</th>
+        <th style="text-align:center;">HCP</th>
+        <th style="text-align:center;">80%</th>
+        <th style="text-align:center;">Gross</th>
+        <th style="text-align:center;font-weight:700;color:var(--text);">Neto</th>
+      </tr></thead>
+      <tbody>`;
+
+  players.forEach((p, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+    const teamColor = p.team === 'mx' ? 'var(--mx)' : 'var(--co-dark)';
+    const flag = p.team === 'mx' ? '🇲🇽' : '🇨🇴';
+    html += `<tr style="${i===0?'background:var(--bg);font-weight:600;':''}">
+      <td style="text-align:center;font-size:15px;">${medal}</td>
+      <td>
+        <div style="font-size:13px;font-weight:500;color:${teamColor}">${flag} ${p.name}</div>
+      </td>
+      <td style="text-align:center;font-size:12px;color:var(--muted);">${p.hcp}</td>
+      <td style="text-align:center;font-size:12px;color:var(--muted);">${p.hcp80}</td>
+      <td style="text-align:center;font-size:13px;">${p.gross}</td>
+      <td style="text-align:center;font-size:15px;font-weight:700;">${p.neto}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>
+  <div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:10px;font-size:11px;color:var(--muted);">
+    Neto = Gross − (HCP × 80%). Menor neto gana.
+  </div>`;
+
+  cont.innerHTML = html;
+}
+
+await loadAll();
+startRealtime();
+renderSalidas();
+renderClasif();
+</script>
+</body>
+</html>
